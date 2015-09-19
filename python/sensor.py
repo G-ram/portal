@@ -111,15 +111,15 @@ class Sensor(object):
 
             # Read length word
             if len(self.buffer) < 2:
-                print("Discarded packet because buffer is empty")
+                #print("Discarded packet because buffer is empty")
                 continue
 
             length = self.buffer[1] + (self.buffer[0] << 8)
             if length > len(self.buffer):
-                print("Discarded packet longer than buffer (%d bytes vs %d bytes)" % (length, len(self.buffer)))
+                #print("Discarded packet longer than buffer (%d bytes vs %d bytes)" % (length, len(self.buffer)))
                 continue # packet is longer than our buffer
             if length < 32:
-                print("Discarded packet shorter than minimum (%d bytes vs 32 bytes)" % (length))
+                #print("Discarded packet shorter than minimum (%d bytes vs 32 bytes)" % (length))
                 continue # packet is shorter than minimum size
 
             packet = self.buffer[0:length]
@@ -127,7 +127,7 @@ class Sensor(object):
             calcCrc = crc16(packet[4:])
             txCrc = packet[3] + (packet[2] << 8)
             if calcCrc != txCrc:
-                print("Warning: Transmitted CRC %04X != %04X Calculated" % (txCrc, calcCrc))
+                #print("Warning: Transmitted CRC %04X != %04X Calculated" % (txCrc, calcCrc))
                 continue
             packet = self.removeEscapedFFs(packet)
 
@@ -138,7 +138,7 @@ class Sensor(object):
 
             # accept the packet, remove it from buffer
             self.buffer[0:length] = []
-            print("Accepting packet, %d bytes long" % length)
+            #print("Accepting packet, %d bytes long" % length)
             return packet
 
     def removeEscapedFFs(self, packet):
@@ -164,7 +164,7 @@ class Sensor(object):
         while rx == 65536:
             (rx, tx, stat) = self.sensor.getStatus()
             buf = self.sensor.read(rx)
-            print("Read %d bytes" % len(buf))
+            #print("Read %d bytes" % len(buf))
             if rx == 65536:
                 print("Discarding buffer...")
 
