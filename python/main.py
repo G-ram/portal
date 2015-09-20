@@ -45,10 +45,10 @@ def main():
         pixels_normalized = nfunc(pixels_zeroed, min, max)
         large = sp.ndimage.zoom(pixels_normalized, 10, order=1)
         large = large.astype(np.uint8);
-        large = cv.medianBlur(large,5)
+        large = cv.medianBlur(large,7)
         #large = cv.GaussianBlur(large,(7,7),0)
         #stuff, blobs = cv.threshold(large,150,255,cv.THRESH_BINARY)
-        stuff, blobs = cv.threshold(large,170,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
+        stuff, blobs = cv.threshold(large,160,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
         contours, hierarchy = cv.findContours(blobs, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
         out = np.zeros((height*10,width*10,3), np.uint8)
         cv.drawContours(out,contours,-1,(255,255,0),3)
@@ -69,21 +69,22 @@ def main():
         y = rect[0][1]
         angle = rect[2];
 
-        send(x, y, angle)
+        if(regions_found < 10):
+            send(x, y, angle)
 
-        time.sleep(0.2)
+        time.sleep(0.4)
 
     sensor.close()
     print "Done. Everything cleaned up."
 
 def send(x, y, theta):
-    root_url = "hey"
-    payload = {'x': x, 'y': y, 'angle': theta}
-    #r = requests.post(root_url+"/data/", data=payload)
-    #if r.json()['code'] == 200:
-    #	print "Sent."
-    #else:
-    #	print r.json()
+    root_url = "http://screen20.meteor.com"#"http://localhost:3000"
+    payload = {'x': x, 'y': y, 'theta': theta}
+    r = requests.post(root_url+"/data/", data=payload)
+    if r.json()['code'] == 200:
+    	print "Sent."
+    else:
+    	print r.json()
 
 def get_next_image():
     images = sensor.getAllImages()
